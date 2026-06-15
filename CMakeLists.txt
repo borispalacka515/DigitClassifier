@@ -5,6 +5,11 @@ project(DigitClassifier VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(Qt6_VERSION 6.10.1)
+set(QT_INSTALL_PATH "D:/Program Files/Qt/${Qt6_VERSION}/msvc2022_64")
+
+set(Qt6_DIR "${QT_INSTALL_PATH}/lib/cmake/Qt6")
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -101,17 +106,11 @@ source_group("DigitClassifier\\Widgets" FILES ${WIDGET_SOURCES})
 source_group("DigitClassifier\\Gallery" FILES ${GALLERY_SOURCES})
 source_group("DigitClassifier\\Dialog" FILES ${DIALOG_SOURCES})
 
-if(WIN32)
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${Qt6_DIR}/../../../bin")
-
-    if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET ${PROJECT_NAME}
-            POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:${PROJECT_NAME}>"
-            COMMENT "Deploying Qt runtime dependencies with windeployqt"
-        )
-    endif()
-endif()
+add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND "${QT_INSTALL_PATH}/bin/windeployqt.exe" "$<TARGET_FILE:${PROJECT_NAME}>"
+    COMMENT "Deploying Qt runtime dependencies with windeployqt"
+)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME}

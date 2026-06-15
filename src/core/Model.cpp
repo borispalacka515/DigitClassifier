@@ -1,65 +1,30 @@
 #include "Model.h"
 #include "Activation.h"
 
-Model::Model()
+Model::Model(const ModelConfig& config)
 {
-    W1.resize(HIDDEN_SIZE, std::vector<double>(INPUT_SIZE, 0.0));
-    b1.resize(HIDDEN_SIZE, 0.0);
+    m_layers.clear();
 
-    W2.resize(OUTPUT_SIZE, std::vector<double>(HIDDEN_SIZE, 0.0));
-    b2.resize(OUTPUT_SIZE, 0.0);
-}
-
-Model::Model(
-    const std::vector<double>& b1,
-    const std::vector<double>& b2,
-    const std::vector<std::vector<double>>& W1,
-    const std::vector<std::vector<double>>& W2
-)
-{
-    this->b1 = b1;
-    this->b2 = b2;
-    this->W1 = W1;
-    this->W2 = W2;
+    for (size_t i = 0; i < config.denseLayerCount(); i++)
+    {
+        int layerInputSize = config.layerSizeAt(i);
+        int layerOutputSize = config.layerSizeAt(i + 1);
+        ActivationType layerActivation = config.layerActivationAt(i);
+        
+        m_layers.emplace_back(layerInputSize, layerOutputSize, layerActivation);
+    }
 }
 
 std::vector<double> Model::forward(const std::vector<double>& input)
-{
-    std::vector<double> z1(HIDDEN_SIZE);            // výstup W1*x + b1
-    std::vector<double> a1(HIDDEN_SIZE);            // ReLU(z1)
+{   
+    std::vector<double> output = input;
 
-    std::vector<double> z2(OUTPUT_SIZE);            // výstup W2*a1 + b2
-    std::vector<double> p(OUTPUT_SIZE); // softmax(z2)
-
-    // z1 = W1 * input + b1
-    for (size_t i = 0; i < HIDDEN_SIZE; ++i)
+    for (const auto& layer : m_layers)
     {
-        z1[i] = 0;
-        for (size_t j = 0; j < INPUT_SIZE; ++j)
-        {
-            z1[i] += W1[i][j] * input[j];
-        }
-        z1[i] += b1[i];
+        output = layer.forward(output);
     }
 
-    // a1 = ReLU(z1)
-    a1 = Activation::ReLU(z1);
-
-    // z2 = W2 * a1 + b2
-    for (size_t i = 0; i < OUTPUT_SIZE; ++i)
-    {
-        z2[i] = 0;
-        for (size_t j = 0; j < HIDDEN_SIZE; ++j)
-        {
-            z2[i] += W2[i][j] * a1[j];
-        }
-        z2[i] += b2[i];
-    }
-
-    // P = softmax(z2)
-    p = Activation::softmax(z2);
-
-    return p;
+    return output;
 }
 
 int Model::predict(const std::vector<double>& input)

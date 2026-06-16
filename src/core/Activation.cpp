@@ -1,8 +1,48 @@
 #include "Activation.h"
 #include <cmath>
 #include <algorithm>
+#include <stdexcept>
 
 namespace Activation {
+
+	ActivationType fromString(const std::string& name)
+	{
+		if (name == "None")
+		{
+			return ActivationType::None;
+		}
+
+		if (name == "ReLU")
+		{
+			return ActivationType::ReLU;
+		}
+
+		if (name == "softmax")
+		{
+			return ActivationType::Softmax;
+		}
+
+		throw std::runtime_error("Uknown activation type.");
+	}
+
+	std::string toString(ActivationType type)
+	{
+		switch (type)
+		{
+		case ActivationType::None:
+			return "None";
+
+		case ActivationType::ReLU:
+			return "ReLU";
+
+		case ActivationType::Softmax:
+			return "Softmax";
+
+		default:
+			throw std::runtime_error("Uknown activation type.");
+		}
+	}
+
 	double ReLU(double x)
 	{
 		return std::max(0.0, x);

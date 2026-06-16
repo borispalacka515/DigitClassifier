@@ -10,12 +10,19 @@
 class Model
 {
 private:
+    ModelConfig m_config;
     std::vector<DenseLayer> m_layers;
 
 public:
     explicit Model(
         const ModelConfig& config
     );
+
+    const ModelConfig& config() const;
+
+    const std::vector<DenseLayer>& layers() const;
+    const DenseLayer& layerAt(size_t index) const;
+
 
     std::vector<double> forward(const std::vector<double>& input);
     int predict(const std::vector<double>& input);

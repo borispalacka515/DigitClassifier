@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 enum class ActivationType
 {
@@ -11,6 +12,9 @@ enum class ActivationType
 
 namespace Activation
 {
+    std::string toString(ActivationType type);
+    ActivationType fromString(const std::string& name);
+
     double ReLU(double x);
     double ReLUDerivative(double x);
 

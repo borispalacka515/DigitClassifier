@@ -16,6 +16,15 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
 
+include(FetchContent)
+
+FetchContent_Declare(
+    nlohmann_json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
+
 set(APP_SOURCES
     src/app/main.cpp
     src/app/DigitClassifier.h
@@ -32,6 +41,8 @@ set(CORE_SOURCES
     src/core/ModelConfig.h
     src/core/Model.h
     src/core/Model.cpp
+    src/core/ModelSerializer.h
+    src/core/ModelSerializer.cpp
 )
 
 set(DATA_SOURCES
@@ -84,6 +95,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Widgets
         Qt6::Core
         Qt6::Gui
+        nlohmann_json::nlohmann_json
 )
 
 target_include_directories(${PROJECT_NAME}

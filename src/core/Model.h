@@ -23,6 +23,12 @@ public:
     const std::vector<DenseLayer>& layers() const;
     const DenseLayer& layerAt(size_t index) const;
 
+    void setLayerParameters(
+        size_t index,
+        const std::vector<double>& weights,
+        const std::vector<double>& biases
+    );
+
 
     std::vector<double> forward(const std::vector<double>& input);
     int predict(const std::vector<double>& input);

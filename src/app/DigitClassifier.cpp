@@ -3,6 +3,7 @@
 #include "DatasetLoadWorker.h"
 #include "ImageConverter.h"
 #include "DatasetOpenDialog.h"
+#include "ModelSerializer.h"
 
 #include <QThread>
 #include <QMessageBox>
@@ -39,6 +40,56 @@ DigitClassifier::DigitClassifier(QWidget *parent)
 
     connect(ui.openDatasetAction, &QAction::triggered,
         this, &DigitClassifier::openDataset);
+
+    try
+    {
+        std::filesystem::path inputPath =
+            std::filesystem::path(
+                QCoreApplication::applicationDirPath().toStdString()
+            ) / "test_model.json";
+
+        std::filesystem::path outputPath =
+            std::filesystem::path(
+                QCoreApplication::applicationDirPath().toStdString()
+            ) / "test_model_modified.json";
+
+        Model model =
+            ModelSerializer::loadFromFile(inputPath);
+
+        std::vector<double> weights =
+            model.layerAt(0).weights();
+
+        std::vector<double> biases =
+            model.layerAt(0).biases();
+
+        weights[0] = 9.99;
+        biases[0] = -1.0;
+
+        model.setLayerParameters(
+            0,
+            weights,
+            biases
+        );
+
+        ModelSerializer::saveToFile(
+            model,
+            outputPath
+        );
+
+        QMessageBox::information(
+            this,
+            "Model test",
+            "Model was loaded, modified and saved successfully."
+        );
+    }
+    catch (const std::exception& e)
+    {
+        QMessageBox::critical(
+            this,
+            "Model test error",
+            e.what()
+        );
+    }
 }
 
 DigitClassifier::~DigitClassifier()

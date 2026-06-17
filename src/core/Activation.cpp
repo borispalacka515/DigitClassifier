@@ -17,7 +17,7 @@ namespace Activation {
 			return ActivationType::ReLU;
 		}
 
-		if (name == "softmax")
+		if (name == "Softmax")
 		{
 			return ActivationType::Softmax;
 		}

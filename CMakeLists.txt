@@ -39,6 +39,7 @@ set(CORE_SOURCES
     src/core/DenseLayer.h
     src/core/DenseLayer.cpp
     src/core/ModelConfig.h
+    src/core/ModelConfig.cpp
     src/core/Model.h
     src/core/Model.cpp
     src/core/ModelSerializer.h

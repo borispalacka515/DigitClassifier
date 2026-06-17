@@ -4,20 +4,34 @@
 
 #include <vector>
 
-struct DenseLayer
+class DenseLayer
 {
-    int inputSize = 0;
-    int outputSize = 0;
+private:
+    int m_inputSize = 0;
+    int m_outputSize = 0;
 
-    std::vector<double> weights;
-    std::vector<double> biases;
+    std::vector<double> m_weights;
+    std::vector<double> m_biases;
 
-    ActivationType activation = ActivationType::None;
+    ActivationType m_activation = ActivationType::None;
 
+public:
     DenseLayer(
         int inputSize,
         int outputSize,
         ActivationType activation
+    );
+
+    int inputSize() const;
+    int outputSize() const;
+    ActivationType activation() const;
+
+    const std::vector<double>& weights() const;
+    const std::vector<double>& biases() const;
+
+    void setParameters(
+        const std::vector<double>& weights,
+        const std::vector<double>& biases
     );
 
     std::vector<double> forward(

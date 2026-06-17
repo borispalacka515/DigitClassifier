@@ -37,6 +37,15 @@ const DenseLayer& Model::layerAt(size_t index) const
     return m_layers[index];
 }
 
+void Model::setLayerParameters(
+    size_t index,
+    const std::vector<double>& weights,
+    const std::vector<double>& biases
+)
+{
+    m_layers.at(index).setParameters(weights, biases);
+}
+
 std::vector<double> Model::forward(const std::vector<double>& input)
 {   
     std::vector<double> output = input;

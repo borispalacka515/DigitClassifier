@@ -77,6 +77,15 @@ set(DIALOG_SOURCES
     src/dialog/DatasetOpenDialog.ui
 )
 
+set(TRAINING_SOURCES
+    src/training/Trainer.h
+    src/training/Trainer.cpp
+    src/training/TrainingConfig.h
+    src/training/TrainingConfig.cpp
+    src/training/LossFunction.h
+    src/training/LossFunction.cpp
+)
+
 set(PROJECT_SOURCES
     ${APP_SOURCES}
     ${CORE_SOURCES}
@@ -85,6 +94,7 @@ set(PROJECT_SOURCES
     ${WIDGET_SOURCES}
     ${GALLERY_SOURCES}
     ${DIALOG_SOURCES}
+    ${TRAINING_SOURCES}
 )
 
 qt_add_executable(${PROJECT_NAME}
@@ -109,6 +119,7 @@ target_include_directories(${PROJECT_NAME}
         src/widgets
         src/gallery
         src/dialog
+        src/training
 )
 
 source_group("DigitClassifier\\App" FILES ${APP_SOURCES})
@@ -118,6 +129,7 @@ source_group("DigitClassifier\\Image" FILES ${IMAGE_SOURCES})
 source_group("DigitClassifier\\Widgets" FILES ${WIDGET_SOURCES})
 source_group("DigitClassifier\\Gallery" FILES ${GALLERY_SOURCES})
 source_group("DigitClassifier\\Dialog" FILES ${DIALOG_SOURCES})
+source_group("DigitClassifier\\Training" FILES ${TRAINING_SOURCES})
 
 add_custom_command(TARGET ${PROJECT_NAME}
     POST_BUILD

@@ -29,12 +29,7 @@ const std::vector<DenseLayer>& Model::layers() const
 
 const DenseLayer& Model::layerAt(size_t index) const
 {
-    if (index < 0 || index >= m_layers.size())
-    {
-        throw std::out_of_range("Index of layer is out of range.");
-    }
-
-    return m_layers[index];
+    return m_layers.at(index);
 }
 
 void Model::setLayerParameters(

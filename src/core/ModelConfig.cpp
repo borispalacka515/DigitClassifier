@@ -54,6 +54,16 @@ const std::vector<int>& ModelConfig::layerSizes() const
     return m_layerSizes;
 }
 
+int ModelConfig::inputSize() const
+{
+    return m_layerSizes.front();
+}
+
+int ModelConfig::outputSize() const
+{
+    return m_layerSizes.back();
+}
+
 ActivationType ModelConfig::layerActivationAt(size_t index) const
 {
     return m_layerActivations.at(index);

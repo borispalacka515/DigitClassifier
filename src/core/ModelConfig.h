@@ -22,6 +22,9 @@ public:
     int layerSizeAt(size_t index) const;
     const std::vector<int>& layerSizes() const;
 
+    int inputSize() const;
+    int outputSize() const;
+
     ActivationType layerActivationAt(size_t index) const;
     const std::vector<ActivationType>& layerActivations() const;
 

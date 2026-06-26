@@ -10,8 +10,6 @@ private:
 	int m_epochCount;
 	double m_learningRate;
 
-	void validate() const;
-
 public:
 
 	TrainingConfig(
@@ -24,4 +22,7 @@ public:
 	int epochCount() const;
 	double learningRate() const;
 
+private:
+
+	void validate() const;
 };

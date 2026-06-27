@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "Activation.h"
+
 #include <stdexcept>
 
 Model::Model(const ModelConfig& config) 
@@ -41,7 +42,8 @@ void Model::setLayerParameters(
     m_layers.at(index).setParameters(weights, biases);
 }
 
-std::vector<double> Model::forward(const std::vector<double>& input)
+std::vector<double> Model::forward(
+    const std::vector<double>& input) const
 {   
     std::vector<double> output = input;
 
@@ -51,6 +53,14 @@ std::vector<double> Model::forward(const std::vector<double>& input)
     }
 
     return output;
+}
+
+std::vector<double> Model::backward(
+    const std::vector<double>& input,
+    const std::vector<double>& outputGradient
+) const
+{
+    std::vector<std::vector<double>> deltas(m_config.denseLayerCount());
 }
 
 int Model::predict(const std::vector<double>& input)

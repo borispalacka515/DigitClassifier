@@ -6,11 +6,13 @@
 TrainingConfig::TrainingConfig(
 	int batchSize,
 	int epochCount,
-	double learningRate
+	double learningRate,
+	LossFunctionType lossFunctionType
 ) :
 	m_batchSize(batchSize),
 	m_epochCount(epochCount),
-	m_learningRate(learningRate)
+	m_learningRate(learningRate),
+	m_lossFunctionType(lossFunctionType)
 {
 	TrainingConfig::validate();
 }
@@ -28,6 +30,11 @@ int TrainingConfig::epochCount() const
 double TrainingConfig::learningRate() const
 {
 	return m_learningRate;
+}
+
+LossFunctionType TrainingConfig::lossFunctionType() const
+{
+	return m_lossFunctionType;
 }
 
 void TrainingConfig::validate() const

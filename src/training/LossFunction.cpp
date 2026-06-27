@@ -3,6 +3,8 @@
 #include <cmath>
 #include <stdexcept>
 
+
+
 namespace LossFunction
 {
     double crossEntropy(
@@ -37,7 +39,20 @@ namespace LossFunction
         return -std::log(probability);
     }
 
-    double MeanSquareError(
+    std::vector<double> crossEntropyGradient(
+        const std::vector<double>& predicted,
+        int targetLabel
+    )
+    {
+        const double epsilon = 1e-12;
+
+        std::vector<double> gradient(predicted.size(), 0);
+        gradient.at(targetLabel) = -1 / std::max(predicted.at(targetLabel), epsilon);
+
+        return gradient;
+    }
+
+    double meanSquaredError(
         const std::vector<double>& predicted,
         int targetLabel
     )
@@ -64,4 +79,22 @@ namespace LossFunction
 
         return mseSum;
     }
+
+    std::vector<double> meanSquaredErrorGradient(
+        const std::vector<double>& predicted,
+        int targetLabel
+    )
+    {
+        std::vector<double> gradient(predicted.size());
+
+        for (size_t i = 0; i < predicted.size(); ++i)
+        {
+            const double target = (i == targetLabel) ? 1.0 : 0.0;
+
+            gradient[i] = 2.0 * (predicted.at(i) - target);
+        }
+
+        return gradient;
+    }
+
 }

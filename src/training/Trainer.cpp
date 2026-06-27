@@ -1,4 +1,5 @@
 #include "Trainer.h"
+#include "LossFunction.h"
 
 #include <vector>
 #include <stdexcept>
@@ -83,8 +84,19 @@ void Trainer::trainBatch(
 	const std::vector<std::reference_wrapper<const Sample>>& batch
 ) const
 {
-	for (const auto& sample : batch)
+	double totalLoss = 0.0;
+
+	for (const auto& sampleReference : batch)
 	{
+		//forward
+		const Sample& sample = sampleReference.get();
+		
+		std::vector<double> output = model.forward(sample.input);
+
+		//loss 
+		double loss = LossFunction::crossEntropy(output, sample.label);
+		totalLoss += loss;
+
 		//model.backward(sample);
 	}
 }

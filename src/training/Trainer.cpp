@@ -88,16 +88,22 @@ void Trainer::trainBatch(
 
 	for (const auto& sampleReference : batch)
 	{
-		//forward
+		// forward
 		const Sample& sample = sampleReference.get();
 		
-		std::vector<double> output = model.forward(sample.input);
+		const std::vector<double> output = model.forward(sample.input);
 
-		//loss 
+		// loss 
 		double loss = LossFunction::crossEntropy(output, sample.label);
+
 		totalLoss += loss;
 
-		//model.backward(sample);
+		// backward;
+
+		auto outputGradient = 
+			LossFunction::gradient(output, sample.label, config.lossFunctionType());
+
+		model.backward(outputGradient);
 	}
 }
 

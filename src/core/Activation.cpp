@@ -134,7 +134,7 @@ namespace Activation {
 			return Activation::softmax(x);
 
 		default:
-			throw std::runtime_error("Unsupported activation type.");
+			throw std::invalid_argument("Unsupported activation type.");
 		}
 	}
 
@@ -149,7 +149,7 @@ namespace Activation {
 			return Activation::ReLUDerivative(x);
 
 		default:
-			throw std::runtime_error("Unsupported activation type.");
+			throw std::invalid_argument("Unsupported activation type.");
 		}
 	}
 

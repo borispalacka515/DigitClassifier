@@ -22,9 +22,10 @@ private:
     bool m_hasCachedForward;
 
     // gradient cache
-    std::vector<std::vector<double>> m_weightGradients;
-    std::vector<double> m_biasGradients;
-    bool m_hasGradients;
+    std::vector<std::vector<double>> m_accumulatedWeightGradients;
+    std::vector<double> m_accumulatedBiasGradients;
+    bool m_hasAccumulatedGradients;
+    size_t m_accumulatedGradientCount;
 
 public:
     DenseLayer(
@@ -54,4 +55,8 @@ public:
     std::vector<double> backward(
         const std::vector<double>& outputGradient
     );
+
+    // Temporary solution
+
+    void updateParameters(double learningRate);
 };

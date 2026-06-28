@@ -30,12 +30,17 @@ public:
     );
 
 
-    std::vector<double> forward(const std::vector<double>& input);
+    std::vector<double> forward(
+        const std::vector<double>& input
+    );
 
-    std::vector<double> backward(
-        const std::vector<double>& input,
+    void backward(
         const std::vector<double>& outputGradient
-    ) const;
+    );
 
     int predict(const std::vector<double>& input);
+
+    // Temporary Solution
+
+    void updateLayerParameters(double learningRate);
 };

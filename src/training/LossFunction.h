@@ -30,4 +30,10 @@ namespace LossFunction
 		const std::vector<double>& predicted,
 		int targetLabel
 	);
+
+	std::vector<double> gradient(
+		const std::vector<double>& predicted,
+		int targetLabel,
+		LossFunctionType type
+	);
 }

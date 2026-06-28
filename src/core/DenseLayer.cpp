@@ -14,7 +14,8 @@ DenseLayer::DenseLayer(
     m_weights(inputSize* outputSize),
     m_biases(outputSize),
     m_hasCachedForward(false),
-    m_hasGradients(false)
+    m_hasAccumulatedGradients(false),
+    m_accumulatedGradientCount(0)
 {
 }
 
@@ -86,15 +87,30 @@ std::vector<double> DenseLayer::backward(
 
     for (size_t i = 0; i < m_outputSize; i++)
     {
-        m_biasGradients[i] = delta[i];
+        m_accumulatedBiasGradients[i] += delta[i];
 
         for (size_t j = 0; j < m_inputSize; j++)
         {
-            m_weightGradients[i][j] = delta[i] * m_lastInput[j];
+            m_accumulatedWeightGradients[i][j] += delta[i] * m_lastInput[j];
         }
     }
 
-    return {};
+    m_hasAccumulatedGradients = true;
+    m_accumulatedGradientCount++;
+
+    std::vector<double> inputGradient(m_inputSize);
+
+    for (size_t i = 0; i < m_inputSize; i++)
+    {
+        inputGradient[i] = 0;
+
+        for (size_t j = 0; j < m_outputSize; j++)
+        {
+            inputGradient[i] += m_weights[j * m_inputSize + i] * delta[j];
+        }
+    }
+
+    return inputGradient;
 }
 
 void DenseLayer::setParameters(
@@ -150,4 +166,29 @@ const std::vector<double>& DenseLayer::biases() const
 bool DenseLayer::hasCachedForward() const
 {
     return m_hasCachedForward;
+}
+
+// Temporary solution
+
+void DenseLayer::updateParameters(double learningRate)
+{
+    if (!m_hasAccumulatedGradients)
+    {
+        throw std::logic_error(
+            "Parameter update requires accumulated gradients."
+        );
+    }
+
+    for (size_t i = 0; i < m_outputSize; i++)
+    {
+        m_biases[i] -= learningRate * m_accumulatedBiasGradients[i] / m_accumulatedGradientCount;
+
+        for (size_t j = 0; j < m_inputSize; j++)
+        {
+            m_weights[i * m_inputSize + j] -= learningRate * m_accumulatedWeightGradients[i][j] / m_accumulatedGradientCount;
+        }
+    }
+
+    m_hasAccumulatedGradients = false;
+    m_hasCachedForward = false;
 }

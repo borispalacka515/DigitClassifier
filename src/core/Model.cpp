@@ -42,6 +42,15 @@ void Model::setLayerParameters(
     m_layers.at(index).setParameters(weights, biases);
 }
 
+int Model::predict(const std::vector<double>& probabilities)
+{
+    auto it = std::max_element(probabilities.begin(), probabilities.end());
+
+    int predicted_digit = static_cast<int>(it - probabilities.begin());
+
+    return predicted_digit;
+}
+
 std::vector<double> Model::forward(
     const std::vector<double>& input)
 {   
@@ -55,36 +64,24 @@ std::vector<double> Model::forward(
     return output;
 }
 
-std::vector<double> Model::backward(
-    const std::vector<double>& input,
+void Model::backward(
     const std::vector<double>& outputGradient
-) const
+)
 {
-    const size_t layerCount = m_config.denseLayerCount();
+    auto gradient = outputGradient;
 
-    std::vector<std::vector<double>> deltas(layerCount);
-    std::vector < std::vector<double>> jacobian = Activation::softmaxDerivative(input);
-
-    for (size_t i = 0; i < m_layers.back().outputSize(); ++i)
+    for(auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
     {
-        deltas[layerCount][i] = 0;
-
-        for (size_t j = 0; j < m_layers.back().outputSize(); ++j)
-        {
-            deltas[layerCount][i] += outputGradient[j] * jacobian[i][j];
-        }
+        gradient = it->backward(gradient);
     }
-
-    return {};
 }
 
-int Model::predict(const std::vector<double>& input)
+// Temporary solution
+
+void Model::updateLayerParameters(double learningRate)
 {
-    std::vector<double> probabilities = forward(input);
-
-    auto it = std::max_element(probabilities.begin(), probabilities.end());
-
-    int predicted_digit = static_cast<int>(it - probabilities.begin());
-
-    return predicted_digit;
+    for (auto& layer : m_layers)
+    {
+        layer.updateParameters(learningRate);
+    }
 }

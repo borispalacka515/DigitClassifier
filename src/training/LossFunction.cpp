@@ -3,8 +3,6 @@
 #include <cmath>
 #include <stdexcept>
 
-
-
 namespace LossFunction
 {
     double crossEntropy(
@@ -95,6 +93,27 @@ namespace LossFunction
         }
 
         return gradient;
+    }
+
+    std::vector<double> gradient(
+        const std::vector<double> predicted,
+        int targetLabel,
+        LossFunctionType type
+    )
+    {
+        switch (type)
+        {
+        case LossFunctionType::CrossEntropy:
+            return crossEntropyGradient(predicted, targetLabel);
+
+        case LossFunctionType::MeanSquareError:
+            return meanSquaredErrorGradient(predicted, targetLabel);
+
+        default:
+            throw std::invalid_argument(
+                "Unknown Loss function type."
+            );
+        }
     }
 
 }

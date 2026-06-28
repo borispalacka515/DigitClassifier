@@ -4,10 +4,12 @@
 #include "ImageConverter.h"
 #include "DatasetOpenDialog.h"
 #include "ModelSerializer.h"
+#include "Trainer.h"
 
 #include <QThread>
 #include <QMessageBox>
 #include <QSpinBox>
+#include <iostream>
 
 
 const QString t10kImagesPath =
@@ -40,60 +42,45 @@ DigitClassifier::DigitClassifier(QWidget *parent)
 
     connect(ui.openDatasetAction, &QAction::triggered,
         this, &DigitClassifier::openDataset);
-
-    try
-    {
-        std::filesystem::path inputPath =
-            std::filesystem::path(
-                QCoreApplication::applicationDirPath().toStdString()
-            ) / "test_model.json";
-
-        std::filesystem::path outputPath =
-            std::filesystem::path(
-                QCoreApplication::applicationDirPath().toStdString()
-            ) / "test_model_modified.json";
-
-        Model model =
-            ModelSerializer::loadFromFile(inputPath);
-
-        std::vector<double> weights =
-            model.layerAt(0).weights();
-
-        std::vector<double> biases =
-            model.layerAt(0).biases();
-
-        weights[0] = 9.99;
-        biases[0] = -1.0;
-
-        model.setLayerParameters(
-            0,
-            weights,
-            biases
-        );
-
-        ModelSerializer::saveToFile(
-            model,
-            outputPath
-        );
-
-        QMessageBox::information(
-            this,
-            "Model test",
-            "Model was loaded, modified and saved successfully."
-        );
-    }
-    catch (const std::exception& e)
-    {
-       /* QMessageBox::critical(
-            this,
-            "Model test error",
-            e.what()
-        );*/
-    }
 }
 
 DigitClassifier::~DigitClassifier()
 {}
+
+void trainingTest(Dataset trainingDataset)
+{
+    try
+    {
+        // 784 vstupov = 28x28 MNIST obrázok
+        // 128 hidden neurónov
+        // 10 výstupov = číslice 0 až 9
+        ModelConfig modelConfig(
+            { 784, 128, 10 },
+            { ActivationType::ReLU, ActivationType::Softmax }
+        );
+
+        Model model(modelConfig);
+
+        TrainingConfig trainingConfig(
+            128,                              // batch size
+            3,                               // epoch count
+            1.0,                            // learning rate
+            LossFunctionType::CrossEntropy
+        );
+
+
+        Trainer trainer;
+        trainer.train(model, trainingConfig, trainingDataset);
+
+        std::cout << "Training finished successfully.\n";
+    }
+    catch (const std::exception& exception)
+    {
+        std::cerr << "Training failed: "
+            << exception.what()
+            << '\n';
+    }
+}
 
 void DigitClassifier::openDataset()
 {
@@ -143,6 +130,10 @@ void DigitClassifier::loadDataset(
         {
             dataset = loadedDataset;
             thumbnailModel->setDataset(dataset);
+
+
+            qDebug() << "Dataset has been loaded.";
+            trainingTest(*dataset);
         });
 
     connect(worker, &DatasetLoadWorker::errorOccurred,

@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <numeric>
+#include <iostream>
 
 Trainer::Trainer()
 	: m_rng(std::random_device{}())
@@ -71,40 +72,67 @@ void Trainer::train(
 	{
 		const auto& batches = createRandomBatches(dataset, config.batchSize());
 		
-		for (const auto& batch : batches)
+		for (size_t batchIndex = 0; batchIndex < batches.size(); ++batchIndex)
 		{
-			trainBatch(model, config, batch);
+			const TrainingBatchResult result =
+				trainBatch(model, config, batches[batchIndex]);
+
+			std::cout
+				<< "Epoch " << epoch + 1
+				<< "/" << config.epochCount()
+				<< " | Batch " << batchIndex + 1
+				<< "/" << batches.size()
+				<< " | Loss: " << result.averageLoss
+				<< " | Accuracy: " << result.accuracy * 100.0
+				<< "%\n";
 		}
 	}
 }
 
-void Trainer::trainBatch(
+TrainingBatchResult Trainer::trainBatch(
 	Model& model,
 	const TrainingConfig& config,
 	const std::vector<std::reference_wrapper<const Sample>>& batch
 ) const
 {
 	double totalLoss = 0.0;
+	size_t correctPredictions = 0;
 
 	for (const auto& sampleReference : batch)
 	{
-		// forward
 		const Sample& sample = sampleReference.get();
-		
+
+		// forward
 		const std::vector<double> output = model.forward(sample.input);
+		int predicted = model.predict(output);
 
-		// loss 
+		// Loss
 		double loss = LossFunction::crossEntropy(output, sample.label);
-
 		totalLoss += loss;
 
-		// backward;
+		if (predicted == sample.label)
+		{
+			++correctPredictions;
+		}
 
+		// backward;
 		auto outputGradient = 
 			LossFunction::gradient(output, sample.label, config.lossFunctionType());
 
 		model.backward(outputGradient);
 	}
+
+	model.updateLayerParameters(config.learningRate());
+
+	TrainingBatchResult result;
+	result.accuracy =
+		static_cast<double>(correctPredictions) /
+		static_cast<double>(batch.size());
+
+	result.averageLoss =
+		totalLoss / static_cast<double>(batch.size());
+
+	return result;
 }
 
 

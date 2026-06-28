@@ -38,7 +38,7 @@ public:
         const std::vector<double>& outputGradient
     );
 
-    int predict(const std::vector<double>& input);
+    int predict(const std::vector<double>& probabilities);
 
     // Temporary Solution
 

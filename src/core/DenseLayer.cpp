@@ -1,23 +1,68 @@
 #include "DenseLayer.h"
 
 #include <stdexcept>
+#include <algorithm>
+#include <cmath>
+#include <random>
 
 
 DenseLayer::DenseLayer(
     int inputSize,
     int outputSize,
-    ActivationType activation
+    ActivationType activation,
+    WeightInitializationType initType
 )
     : m_inputSize(inputSize),
     m_outputSize(outputSize),
     m_activation(activation),
+    m_weightInitializationType(initType),
     m_weights(inputSize* outputSize),
     m_biases(outputSize),
     m_hasCachedForward(false),
     m_hasAccumulatedGradients(false),
     m_accumulatedGradientCount(0)
 {
+    m_accumulatedBiasGradients = std::vector<double>(m_outputSize);
+    m_accumulatedWeightGradients = std::vector<std::vector<double>>(m_outputSize, std::vector<double>(m_inputSize));
+
+    initializeWeights();
+    initializeBiases();
 }
+
+void DenseLayer::initializeWeights()
+{
+    std::mt19937 rng(std::random_device{}());
+
+    double standardDeviation = 0.0;
+
+    switch (m_weightInitializationType)
+    {
+    case WeightInitializationType::None:
+        return;
+
+    case WeightInitializationType::He:
+        standardDeviation =
+            std::sqrt(2.0 / static_cast<double>(m_inputSize));
+        break;
+    default:
+        throw std::logic_error(
+            "Unsupported weith initialization type."
+        );
+    }
+
+    std::normal_distribution<double> distribution(0.0, standardDeviation);
+
+    for (double& weight : m_weights)
+    {
+        weight = distribution(rng);
+    }
+}
+
+void DenseLayer::initializeBiases()
+{
+    m_biases = std::vector<double>(m_outputSize, 0.0);
+}
+
 
 std::vector<double> DenseLayer::forward(
     const std::vector<double>& input
@@ -168,6 +213,22 @@ bool DenseLayer::hasCachedForward() const
     return m_hasCachedForward;
 }
 
+void DenseLayer::clearCache()
+{
+    m_lastInput.clear();
+    m_lastZ.clear();
+    m_lastOutput.clear();
+    m_hasCachedForward = false;
+}
+
+void DenseLayer::clearGradients()
+{
+    m_accumulatedBiasGradients = std::vector<double>(m_outputSize);
+    m_accumulatedWeightGradients = std::vector<std::vector<double>>(m_outputSize, std::vector<double>(m_inputSize));
+    m_hasAccumulatedGradients = false;
+    m_accumulatedGradientCount = 0;
+}
+
 // Temporary solution
 
 void DenseLayer::updateParameters(double learningRate)
@@ -189,6 +250,6 @@ void DenseLayer::updateParameters(double learningRate)
         }
     }
 
-    m_hasAccumulatedGradients = false;
-    m_hasCachedForward = false;
+    clearCache();
+    clearGradients();
 }

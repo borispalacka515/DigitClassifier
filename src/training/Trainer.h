@@ -6,6 +6,12 @@
 
 #include <random>
 
+struct TrainingBatchResult
+{
+	double averageLoss = 0.0;
+	double accuracy = 0.0;
+};
+
 class Trainer
 {
 private:
@@ -25,7 +31,7 @@ private:
 		const Dataset& dataset
 	) const;
 
-	void trainBatch(
+	TrainingBatchResult trainBatch(
 		Model& model,
 		const TrainingConfig& config,
 		const std::vector<std::reference_wrapper<const Sample>>& batch

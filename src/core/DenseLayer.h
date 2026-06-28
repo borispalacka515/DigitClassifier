@@ -4,16 +4,24 @@
 
 #include <vector>
 
+enum class WeightInitializationType
+{
+    None,
+    He
+};
+
 class DenseLayer
 {
 private:
-    int m_inputSize = 0;
-    int m_outputSize = 0;
+    int m_inputSize;
+    int m_outputSize;
 
     std::vector<double> m_weights;
     std::vector<double> m_biases;
 
-    ActivationType m_activation = ActivationType::None;
+    ActivationType m_activation;
+
+    WeightInitializationType m_weightInitializationType;
 
     // forward cache
     std::vector<double> m_lastInput;
@@ -31,7 +39,8 @@ public:
     DenseLayer(
         int inputSize,
         int outputSize,
-        ActivationType activation
+        ActivationType activation,
+        WeightInitializationType initType = WeightInitializationType::He
     );
 
     int inputSize() const;
@@ -56,7 +65,14 @@ public:
         const std::vector<double>& outputGradient
     );
 
+    void clearCache();
+    void clearGradients();
+
     // Temporary solution
 
     void updateParameters(double learningRate);
+
+private:
+    void initializeWeights();
+    void initializeBiases();
 };

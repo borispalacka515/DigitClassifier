@@ -12,12 +12,15 @@ DenseLayer::DenseLayer(
     m_outputSize(outputSize),
     m_activation(activation),
     m_weights(inputSize* outputSize),
-    m_biases(outputSize)
-{}
+    m_biases(outputSize),
+    m_hasCachedForward(false),
+    m_hasGradients(false)
+{
+}
 
 std::vector<double> DenseLayer::forward(
     const std::vector<double>& input
-) const
+)
 {
     if (input.size() != m_inputSize)
     {
@@ -37,20 +40,42 @@ std::vector<double> DenseLayer::forward(
             z[i] += m_weights[i * m_inputSize + j] * input[j];
         }
     }
+    m_lastInput = input;
+    m_lastZ = z;
+    m_hasCachedForward = true;
 
     switch (m_activation)
     {
     case ActivationType::None:
-        return z;
+        return m_lastOutput = z;
 
     case ActivationType::ReLU:
-        return Activation::ReLU(z);
+        return m_lastOutput = Activation::ReLU(z);
 
     case ActivationType::Softmax:
-        return Activation::softmax(z);
+        return m_lastOutput = Activation::softmax(z);
 
     default:
         throw std::runtime_error("Unsupported activation type.");
+    }
+}
+
+std::vector<double> DenseLayer::backward(
+    const std::vector<double>& outputGradient
+)
+{
+    if (!m_hasCachedForward)
+    {
+        throw std::logic_error(
+            "Layer backward propagation requires a valid cached forward propagation."
+        );
+    }
+
+    std::vector<double> delta(m_outputSize);
+
+    for (size_t i = 0; i < m_outputSize; i++)
+    {
+        delta[i] = outputGradient[i]; //* activation derivative(m_lastZ[i])
     }
 }
 
@@ -75,6 +100,8 @@ void DenseLayer::setParameters(
 
     m_weights = weights;
     m_biases = biases;
+
+    m_hasCachedForward = false;
 }
 
 int DenseLayer::inputSize() const
@@ -100,4 +127,9 @@ const std::vector<double>& DenseLayer::weights() const
 const std::vector<double>& DenseLayer::biases() const
 {
     return m_biases;
+}
+
+bool DenseLayer::hasCachedForward() const
+{
+    return m_hasCachedForward;
 }

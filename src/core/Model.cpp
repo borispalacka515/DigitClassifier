@@ -43,11 +43,11 @@ void Model::setLayerParameters(
 }
 
 std::vector<double> Model::forward(
-    const std::vector<double>& input) const
+    const std::vector<double>& input)
 {   
     std::vector<double> output = input;
 
-    for (const auto& layer : m_layers)
+    for (auto& layer : m_layers)
     {
         output = layer.forward(output);
     }
@@ -60,7 +60,22 @@ std::vector<double> Model::backward(
     const std::vector<double>& outputGradient
 ) const
 {
-    std::vector<std::vector<double>> deltas(m_config.denseLayerCount());
+    const size_t layerCount = m_config.denseLayerCount();
+
+    std::vector<std::vector<double>> deltas(layerCount);
+    std::vector < std::vector<double>> jacobian = Activation::softmaxDerivative(input);
+
+    for (size_t i = 0; i < m_layers.back().outputSize(); ++i)
+    {
+        deltas[layerCount][i] = 0;
+
+        for (size_t j = 0; j < m_layers.back().outputSize(); ++j)
+        {
+            deltas[layerCount][i] += outputGradient[j] * jacobian[i][j];
+        }
+    }
+
+    return {};
 }
 
 int Model::predict(const std::vector<double>& input)

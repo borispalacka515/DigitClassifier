@@ -1,4 +1,5 @@
 #include "Activation.h"
+
 #include <cmath>
 #include <algorithm>
 #include <stdexcept>
@@ -81,5 +82,30 @@ namespace Activation {
 		}
 		
 		return result;
+	}
+
+	std::vector<std::vector<double>> softmaxDerivative(
+		const std::vector<double>& x
+	)
+	{
+		const std::vector<double> a = softmax(x);
+		const size_t size = a.size();
+
+		std::vector<std::vector<double>> jacobian(
+			size,
+			std::vector<double>(size, 0.0)
+		);
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			for (size_t j = 0; j < size; ++j)
+			{
+				const double kroneckerDelta = (i == j) ? 1.0 : 0.0;
+
+				jacobian[i][j] = a[i] * (kroneckerDelta - a[j]);
+			}
+		}
+
+		return jacobian;
 	}
 }

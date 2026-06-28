@@ -19,5 +19,8 @@ namespace Activation
     double ReLUDerivative(double x);
 
     std::vector<double> ReLU(const std::vector<double>& x);
+
     std::vector<double> softmax(const std::vector<double>& x);
+    std::vector<std::vector<double>> softmaxDerivative(const std::vector<double>& x);
+
 }

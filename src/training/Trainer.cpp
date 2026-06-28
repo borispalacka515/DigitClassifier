@@ -10,7 +10,7 @@ Trainer::Trainer()
 {
 }
 
-std::vector<size_t> Trainer::createShuffledIndices(size_t indicesSize) const
+std::vector<size_t> Trainer::createShuffledIndices(size_t indicesSize)
 {
 	std::vector<size_t> indices(indicesSize);
 
@@ -25,7 +25,7 @@ std::vector<std::vector<std::reference_wrapper<const Sample>>>
 Trainer::createRandomBatches(
 	const Dataset& dataset,
 	size_t batchSize
-) const
+)
 {
 	std::vector<size_t> shuffledIndices =
 		createShuffledIndices(dataset.size());

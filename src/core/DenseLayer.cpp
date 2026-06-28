@@ -40,24 +40,13 @@ std::vector<double> DenseLayer::forward(
             z[i] += m_weights[i * m_inputSize + j] * input[j];
         }
     }
+
     m_lastInput = input;
     m_lastZ = z;
+    m_lastOutput = Activation::activate(z, m_activation);
     m_hasCachedForward = true;
 
-    switch (m_activation)
-    {
-    case ActivationType::None:
-        return m_lastOutput = z;
-
-    case ActivationType::ReLU:
-        return m_lastOutput = Activation::ReLU(z);
-
-    case ActivationType::Softmax:
-        return m_lastOutput = Activation::softmax(z);
-
-    default:
-        throw std::runtime_error("Unsupported activation type.");
-    }
+    return m_lastOutput;
 }
 
 std::vector<double> DenseLayer::backward(
@@ -73,10 +62,39 @@ std::vector<double> DenseLayer::backward(
 
     std::vector<double> delta(m_outputSize);
 
+    if(m_activation == ActivationType::Softmax)
+    {
+        std::vector < std::vector<double>> jacobian = Activation::softmaxDerivative(m_lastZ);
+        for (size_t i = 0; i < m_outputSize; i++)
+        {
+            delta[i] = 0;
+
+            for (size_t j = 0; j < m_outputSize; j++)
+            {
+                delta[i] += jacobian[i][j] * outputGradient[j];
+            }
+        }
+
+    }
+    else
+    {
+        for (size_t i = 0; i < m_outputSize; i++)
+        {
+            delta[i] = outputGradient[i] * Activation::activateDerivative(m_lastZ[i], m_activation);
+        }
+    }
+
     for (size_t i = 0; i < m_outputSize; i++)
     {
-        delta[i] = outputGradient[i]; //* activation derivative(m_lastZ[i])
+        m_biasGradients[i] = delta[i];
+
+        for (size_t j = 0; j < m_inputSize; j++)
+        {
+            m_weightGradients[i][j] = delta[i] * m_lastInput[j];
+        }
     }
+
+    return {};
 }
 
 void DenseLayer::setParameters(

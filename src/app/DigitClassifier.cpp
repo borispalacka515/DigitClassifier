@@ -84,11 +84,11 @@ DigitClassifier::DigitClassifier(QWidget *parent)
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(
+       /* QMessageBox::critical(
             this,
             "Model test error",
             e.what()
-        );
+        );*/
     }
 }
 

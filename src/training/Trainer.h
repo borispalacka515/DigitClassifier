@@ -31,10 +31,10 @@ private:
 		const std::vector<std::reference_wrapper<const Sample>>& batch
 	) const;
 
-	std::vector<size_t> createShuffledIndices(size_t indicesSize) const;
+	std::vector<size_t> createShuffledIndices(size_t indicesSize);
 
 	std::vector<std::vector<std::reference_wrapper<const Sample>>> createRandomBatches(
 		const Dataset& dataset,
 		size_t batchSize
-	) const;
+	);
 };

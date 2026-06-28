@@ -64,6 +64,17 @@ namespace Activation {
 		}
 		return result;
 	}
+
+	std::vector<double> ReLUDerivative(const std::vector<double>& x)
+	{
+		std::vector<double> result(x.size());
+
+		for (size_t i = 0; i < x.size(); ++i)
+		{
+			result[i] = ReLUDerivative(x[i]);
+		}
+		return result;
+	}
 	
 	std::vector<double> softmax(const std::vector<double>& x) 
 	{
@@ -107,5 +118,53 @@ namespace Activation {
 		}
 
 		return jacobian;
+	}
+
+	std::vector<double> activate(const std::vector<double>& x, ActivationType type)
+	{
+		switch (type)
+		{
+		case ActivationType::None:
+			return x;
+
+		case ActivationType::ReLU:
+			return Activation::ReLU(x);
+
+		case ActivationType::Softmax:
+			return Activation::softmax(x);
+
+		default:
+			throw std::runtime_error("Unsupported activation type.");
+		}
+	}
+
+	std::vector<double> activateDerivative(const std::vector<double>& x, ActivationType type)
+	{
+		switch (type)
+		{
+		case ActivationType::None:
+			return std::vector<double>(x.size(), 1.0);
+
+		case ActivationType::ReLU:
+			return Activation::ReLUDerivative(x);
+
+		default:
+			throw std::runtime_error("Unsupported activation type.");
+		}
+	}
+
+	double activateDerivative(double x, ActivationType type)
+	{
+		switch (type)
+		{
+		case ActivationType::None:
+			return 1;
+
+		case ActivationType::ReLU:
+			return Activation::ReLUDerivative(x);
+
+		default:
+			throw std::runtime_error("Unsupported activation type.");
+		}
 	}
 }

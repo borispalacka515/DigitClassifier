@@ -71,7 +71,7 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
           <property name="spacing">
            <number>6</number>
           </property>
@@ -116,6 +116,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="predictPushButton">
+            <property name="text">
+             <string>Predict</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

@@ -11,7 +11,6 @@
 #include <QSpinBox>
 #include <iostream>
 
-
 const QString t10kImagesPath =
 QStringLiteral("../datasets/t10k-dataset/t10k-images.idx3-ubyte");
 
@@ -34,6 +33,8 @@ DigitClassifier::DigitClassifier(QWidget *parent)
         t10kLabelsPath
     );
 
+    m_model = ModelSerializer::loadFromFile("../models/model01.json");
+
     connect(ui.sampleIndexSpinBox, &QSpinBox::valueChanged,
         this, QOverload<int>::of(&DigitClassifier::showSample));
 
@@ -42,10 +43,14 @@ DigitClassifier::DigitClassifier(QWidget *parent)
 
     connect(ui.openDatasetAction, &QAction::triggered,
         this, &DigitClassifier::openDataset);
+
+    connect(ui.predictPushButton, &QPushButton::clicked,
+        this, &DigitClassifier::onPredictSelectedSampleClicked);
 }
 
 DigitClassifier::~DigitClassifier()
 {}
+
 
 void trainingTest(Dataset trainingDataset)
 {
@@ -62,9 +67,9 @@ void trainingTest(Dataset trainingDataset)
         Model model(modelConfig);
 
         TrainingConfig trainingConfig(
-            128,                              // batch size
-            3,                               // epoch count
-            1.0,                            // learning rate
+            256,                              // batch size
+            2,                               // epoch count
+            0.5,                            // learning rate
             LossFunctionType::CrossEntropy
         );
 
@@ -73,6 +78,8 @@ void trainingTest(Dataset trainingDataset)
         trainer.train(model, trainingConfig, trainingDataset);
 
         std::cout << "Training finished successfully.\n";
+
+        ModelSerializer::saveToFile(model, "../models/model01.json");
     }
     catch (const std::exception& exception)
     {
@@ -108,7 +115,7 @@ void DigitClassifier::loadDataset(
 {
     ui.progressBar->setVisible(true);
     ui.progressBar->setValue(0);
-
+     
     QThread* thread = new QThread(this);
 
     DatasetLoadWorker* worker = new DatasetLoadWorker(imagesPath, labelsPath);
@@ -132,8 +139,8 @@ void DigitClassifier::loadDataset(
             thumbnailModel->setDataset(dataset);
 
 
-            qDebug() << "Dataset has been loaded.";
-            trainingTest(*dataset);
+            /*qDebug() << "Dataset has been loaded.";
+            trainingTest(*dataset);*/
         });
 
     connect(worker, &DatasetLoadWorker::errorOccurred,
@@ -160,6 +167,50 @@ void DigitClassifier::loadDataset(
         worker, &QObject::deleteLater);
 
     thread->start();
+}
+
+void DigitClassifier::onPredictSelectedSampleClicked()
+{
+    if (!dataset || dataset->empty())
+    {
+        QMessageBox::warning(
+            this,
+            "Prediction error",
+            "Dataset is not loaded."
+        );
+        return;
+    }
+
+    if (!m_model.has_value())
+    {
+        QMessageBox::warning(
+            this,
+            "Prediction error",
+            "Model is not loaded."
+        );
+        return;
+    }
+
+    try 
+    {
+        const Sample& sample = selectedSample();
+
+        const std::vector<double> output = m_model->forward(sample.input);
+
+        int predictedLabel = m_model->predict(output);
+
+        qDebug() << "Predicted label is" << predictedLabel;
+
+
+    }
+    catch (const std::exception& exception) 
+    {
+        QMessageBox::critical(
+            this,
+            "Prediction error",
+            exception.what()
+        );
+    }
 }
 
 void DigitClassifier::showSample(int index)
@@ -197,6 +248,32 @@ void DigitClassifier::showSample(const QModelIndex& index)
         ui.sampleIndexSpinBox->setValue(sampleIndex);
     }
     showSample(sampleIndex);
+}
+
+int DigitClassifier::selectedSampleIndex() const
+{
+    return ui.sampleIndexSpinBox->value();
+}
+
+const Sample& DigitClassifier::selectedSample() const
+{
+    if (!dataset || dataset->empty())
+    {
+        throw std::runtime_error(
+            "Dataset is not loaded."
+        );
+    }
+
+    const int index = selectedSampleIndex();
+
+    if (index < 0 && index < dataset->size())
+    {
+        throw std::out_of_range(
+            "Selected sample index is out of range."
+        );
+    }
+
+    return dataset->getSample(index);
 }
 
 void DigitClassifier::syncGalleryToSampleIndex(int index)

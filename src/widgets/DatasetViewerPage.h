@@ -29,6 +29,9 @@ public:
 		const QString& labelsFilePath
 	);
 
+	void showPrediction(const std::vector<double>& probabilities);
+	void clearPrediction();
+
 private slots:
 	void showSample(int index);
 	void showSample(const QModelIndex& index);

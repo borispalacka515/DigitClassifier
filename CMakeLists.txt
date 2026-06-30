@@ -67,6 +67,8 @@ set(WIDGET_SOURCES
     src/widgets/DatasetViewerPage.h
     src/widgets/DatasetViewerPage.cpp
     src/widgets/DatasetViewerPage.ui
+    src/Widgets/PredictionBarChartWidget.h
+    src/Widgets/PredictionBarChartWidget.cpp
 )
 
 set(GALLERY_SOURCES

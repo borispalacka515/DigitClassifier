@@ -111,6 +111,8 @@ void DigitClassifier::onPredictSelectedSampleRequested(const Sample& sample)
 
         int predictedLabel = m_model->predict(output);
 
+        ui.datasetViewerPage->showPrediction(output);
+
         qDebug() << "Predicted label is" << predictedLabel;
 
     }

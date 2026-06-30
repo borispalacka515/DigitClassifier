@@ -12,7 +12,7 @@ struct Sample
 class Dataset
 {
 private:
-	std::vector<Sample> samples;
+	std::vector<Sample> m_samples;
 public:
 	Dataset();
 	void addSample(const Sample& sample);

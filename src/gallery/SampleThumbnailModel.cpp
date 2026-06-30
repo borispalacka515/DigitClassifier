@@ -18,7 +18,7 @@ void SampleThumbnailModel::setDataset(
 {
 	beginResetModel();
 
-	this->dataset = dataset;
+	this->m_dataset = dataset;
 
 	endResetModel();
 }
@@ -27,25 +27,25 @@ int SampleThumbnailModel::rowCount(
 	const QModelIndex& parent
 ) const
 {
-	if (parent.isValid() || !dataset)
+	if (parent.isValid() || !m_dataset)
 	{
 		return 0;
 	}
 
-	return dataset->size();
+	return m_dataset->size();
 }
 
 QVariant SampleThumbnailModel::data(
 	const QModelIndex& index, int role
 ) const
 {
-	if (!index.isValid() || !dataset)
+	if (!index.isValid() || !m_dataset)
 	{
 		return {};
 	}
 
 	int sampleIndex = index.row();
-	const Sample& sample = dataset->getSample(sampleIndex);
+	const Sample& sample = m_dataset->getSample(sampleIndex);
 
 	switch (role)
 	{

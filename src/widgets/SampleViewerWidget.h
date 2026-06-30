@@ -8,7 +8,7 @@ class SampleViewerWidget : public QWidget
 	Q_OBJECT
 
 private:
-	QImage image;
+	QImage m_image;
 
 public:
 	explicit SampleViewerWidget(QWidget* parent = nullptr);

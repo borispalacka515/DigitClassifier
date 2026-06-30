@@ -7,8 +7,8 @@ DatasetLoadWorker::DatasetLoadWorker(
 	QObject* parent
 )
 	: QObject(parent),
-	  imagesPath(imagesPath),
-	  labelsPath(labelsPath)
+	  m_imagesPath(imagesPath),
+	  m_labelsPath(labelsPath)
 {
 }
 
@@ -23,8 +23,8 @@ void DatasetLoadWorker::loadDataset()
 
 		auto dataset = std::make_shared<Dataset>(
 				MNISTLoader::load(
-					imagesPath.toStdString(),
-					labelsPath.toStdString(),
+					m_imagesPath.toStdString(),
+					m_labelsPath.toStdString(),
 					progressCallback
 				));
 

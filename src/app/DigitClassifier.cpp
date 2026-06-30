@@ -135,25 +135,25 @@ void DigitClassifier::loadDataset(
     connect(worker, &DatasetLoadWorker::datasetLoaded,
         this, [this](std::shared_ptr<Dataset> loadedDataset)
         {
-            dataset = loadedDataset;
-            thumbnailModel->setDataset(dataset);
-
-
-            /*qDebug() << "Dataset has been loaded.";
-            trainingTest(*dataset);*/
+            m_dataset = loadedDataset;
+            m_thumbnailModel->setDataset(m_dataset);
         });
 
     connect(worker, &DatasetLoadWorker::errorOccurred,
         this, [this](const QString& message)
         {
-            QMessageBox::critical(this, "Dataset loading error", message);
+            QMessageBox::critical(
+                this,
+                "Dataset loading error",
+                message
+            );
         });
 
     connect(worker, &DatasetLoadWorker::finished,
         this, [this]()
         {
             ui.progressBar->setVisible(false);
-            ui.sampleIndexSpinBox->setMaximum(dataset->size());
+            ui.sampleIndexSpinBox->setMaximum(m_dataset->size());
             showSample(0);
         });
 
@@ -171,7 +171,7 @@ void DigitClassifier::loadDataset(
 
 void DigitClassifier::onPredictSelectedSampleClicked()
 {
-    if (!dataset || dataset->empty())
+    if (!m_dataset || m_dataset->empty())
     {
         QMessageBox::warning(
             this,
@@ -215,17 +215,17 @@ void DigitClassifier::onPredictSelectedSampleClicked()
 
 void DigitClassifier::showSample(int index)
 {
-    if (!dataset || dataset->empty())
+    if (!m_dataset || m_dataset->empty())
     {
         return;
     }
 
-    if (index < 0 || dataset->size() <= index)
+    if (index < 0 || m_dataset->size() <= index)
     {
         return;
     }
 
-    const Sample& sample = dataset->getSample(index);
+    const Sample& sample = m_dataset->getSample(index);
 
     ui.sampleViewerWidget->setImage(
         ImageConverter::sampleToImage(sample)
@@ -257,7 +257,7 @@ int DigitClassifier::selectedSampleIndex() const
 
 const Sample& DigitClassifier::selectedSample() const
 {
-    if (!dataset || dataset->empty())
+    if (!m_dataset || m_dataset->empty())
     {
         throw std::runtime_error(
             "Dataset is not loaded."
@@ -266,24 +266,24 @@ const Sample& DigitClassifier::selectedSample() const
 
     const int index = selectedSampleIndex();
 
-    if (index < 0 && index < dataset->size())
+    if (index < 0 && index < m_dataset->size())
     {
         throw std::out_of_range(
             "Selected sample index is out of range."
         );
     }
 
-    return dataset->getSample(index);
+    return m_dataset->getSample(index);
 }
 
 void DigitClassifier::syncGalleryToSampleIndex(int index)
 {
-    if (!thumbnailModel)
+    if (!m_thumbnailModel)
     {
         return;
     }
 
-    QModelIndex modelIndex = thumbnailModel->index(index, 0);
+    QModelIndex modelIndex = m_thumbnailModel->index(index, 0);
 
     if (!modelIndex.isValid())
     {

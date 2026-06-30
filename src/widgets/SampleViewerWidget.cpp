@@ -11,19 +11,19 @@ SampleViewerWidget::SampleViewerWidget(QWidget* parent)
 
 void SampleViewerWidget::setImage(const QImage& image)
 {
-	this->image = image;
+	m_image = image;
 	update();
 }
 
 void SampleViewerWidget::clear()
 {
-	image = QImage();
+	m_image = QImage();
 	update();
 }
 
 bool SampleViewerWidget::isEmpty() const
 {
-	return image.isNull();
+	return m_image.isNull();
 }
 
 void SampleViewerWidget::paintEvent(QPaintEvent* event)
@@ -31,12 +31,12 @@ void SampleViewerWidget::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.fillRect(rect(), Qt::black);
 
-	if (image.isNull())
+	if (m_image.isNull())
 	{
 		return;
 	}
 
-	QImage scaledImage = image.scaled(
+	QImage scaledImage = m_image.scaled(
 		size(),
 		Qt::KeepAspectRatio,
 		Qt::FastTransformation

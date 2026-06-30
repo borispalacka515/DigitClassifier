@@ -11,8 +11,8 @@ class DatasetLoadWorker : public QObject
 	Q_OBJECT
 
 private:
-	QString imagesPath;
-	QString labelsPath;
+	QString m_imagesPath;
+	QString m_labelsPath;
 
 public:
 	DatasetLoadWorker(

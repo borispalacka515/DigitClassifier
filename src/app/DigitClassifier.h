@@ -16,11 +16,11 @@ class DigitClassifier : public QMainWindow
 private:
     Ui::DigitClassifierClass ui;
 
-    std::shared_ptr<Dataset> dataset;
+    std::shared_ptr<Dataset> m_dataset;
 
     std::optional<Model> m_model;
 
-    SampleThumbnailModel* thumbnailModel = nullptr;
+    SampleThumbnailModel* m_thumbnailModel = nullptr;
 
 public:
     DigitClassifier(QWidget *parent = nullptr);

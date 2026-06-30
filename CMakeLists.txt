@@ -64,6 +64,9 @@ set(IMAGE_SOURCES
 set(WIDGET_SOURCES
     src/widgets/SampleViewerWidget.h
     src/widgets/SampleViewerWidget.cpp
+    src/widgets/DatasetViewerPage.h
+    src/widgets/DatasetViewerPage.cpp
+    src/widgets/DatasetViewerPage.ui
 )
 
 set(GALLERY_SOURCES

@@ -89,7 +89,7 @@ void DigitClassifier::openDataset()
         return;
     }
 
-    //loadDataset(imagesPath, labelsPath);
+    ui.datasetViewerPage->loadDataset(imagesPath, labelsPath);
 }
 
 void DigitClassifier::onPredictSelectedSampleRequested(const Sample& sample)

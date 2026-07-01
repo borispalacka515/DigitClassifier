@@ -125,12 +125,6 @@ void DatasetViewerPage::showPrediction(const std::vector<double>& probabilities)
     const int predictedLabel = Model::predict(probabilities);
 
     const double confidence = probabilities.at(predictedLabel) * 100;
-
-    ui->predictionSummaryLabel->setText(
-        QString("Predicted label is %1 with confidence %2%")
-        .arg(predictedLabel)
-        .arg(confidence, 0, 'f', 2)
-    );
 }
 
 void DatasetViewerPage::clearPrediction()
